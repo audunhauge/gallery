@@ -28,21 +28,51 @@
   left: 0px;
   right: 0px;
   background: #a4d2d2;
-  font-size: 1.2em;
+  font-size: 1em;
 }
 
 #scroll {
   position:absolute;
   overflow: hidden;
   right: 30px;
+  left: 30px;
   color: white;
   height: 100%;
-  left: 30px;
-  right: 30px;
-  padding-top: 5px;
+  padding-top: 7px;
   padding-left: 3px;
 }
 
 #text {
-  width: 8000px;
+  position: absolute;
+  left: 0px;
+  width: 800px;
+  white-space: nowrap;
+  transition: left 0.3s ease-in-out;
+}
+
+#debug {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 150px;
+  height: 100px;
+}
+
+#textmeasure {
+  visibility: hidden;
+  white-space: nowrap;
+  font-size: 1em;
+}
+
+
+span.cat:hover {
+  color: black;
+  cursor: pointer;
+}
+
+.paused {
+    -webkit-animation-play-state:paused;
+    -moz-animation-play-state:paused;
+    -o-animation-play-state:paused; 
+    animation-play-state:paused;
 }
