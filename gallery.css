@@ -1,0 +1,10 @@
+#gallery {
+  position:relative;
+  width:575px;
+  height:675px;
+  margin:auto;
+  left:0;
+  right:0;
+  background: red;
+  
+}
