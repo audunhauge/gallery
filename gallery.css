@@ -1,10 +1,24 @@
 #gallery {
   position:relative;
-  width:575px;
-  height:675px;
+  overflow:hidden;
+  width:515px;
+  height:615px;
   margin:auto;
   left:0;
   right:0;
-  background: red;
-  
+  background: rgba(200,200,90,0.3);
+  padding:30px;
+}
+
+#category {
+  position: absolute;
+  height: 30px;
+  width:8000px;
+  top:0;
+  left:0;
+  color: white;
+  background: rgba(100,200,90,0.3);
+  font-size: 1.2em;
+  padding: 3px;
+  padding-top:8px;
 }
