@@ -8,5 +8,5 @@ function setup() {
   for (i = 0; i < catsize; i++) {
     catNames.push(category[i].title);
   }
-  document.getElementById("category").innerHTML = catNames.join('');
+  document.getElementById("text").innerHTML = catNames.join('');
 }

@@ -1,24 +1,48 @@
 #gallery {
   position:relative;
-  overflow:hidden;
-  width:515px;
-  height:615px;
+  width:575px;
+  height:675px;
   margin:auto;
   left:0;
   right:0;
-  background: rgba(200,200,90,0.3);
-  padding:30px;
+  background-color:rgba(200,240,240,0.3);
+}
+#gallery:after {
+  content: "";
+  background: url(backimage.jpg);
+  background-size: cover;
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;   
 }
 
 #category {
   position: absolute;
-  height: 30px;
-  width:8000px;
-  top:0;
-  left:0;
-  color: white;
-  background: rgba(100,200,90,0.3);
+  height: 40px;
+  width: 575px;
+  top: 0;
+  left: 0px;
+  right: 0px;
+  background: #a4d2d2;
   font-size: 1.2em;
-  padding: 3px;
-  padding-top:8px;
+}
+
+#scroll {
+  position:absolute;
+  overflow: hidden;
+  right: 30px;
+  color: white;
+  height: 100%;
+  left: 30px;
+  right: 30px;
+  padding-top: 5px;
+  padding-left: 3px;
+}
+
+#text {
+  width: 8000px;
 }
