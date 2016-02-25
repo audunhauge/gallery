@@ -12,12 +12,16 @@ function setup() {
   var divDBG = document.getElementById("debug");
   var spanText = document.getElementById("textmeasure");
   
+  /* The category scroll line */
   var catScroll = 0;        // start with no scroll
   var txtPos;               // mouse xpos on category scroll
   var scrolling = false;    // tru if animating a scroll
   var scrollTimer = null;   // so we can turn off scroll timer
   var scrollLength = 800;   // guesstimate of text length
   var scrollIndex = 0;      // starting on first category
+  
+  /* Thumb paging */
+  var thumIndex = 0;        // will be 0, 16, ...
  
 
   var config = imagelist.mediagallery;
@@ -43,32 +47,62 @@ function setup() {
    * Create thumb divs as specified by config
    */
   (function() {
-    var i,j;
+    var i,j,n;
     var divThumb;
+    n = 0;
     for (i=0; i<config.thumbrows; i++) {
       for (j=0; j<config.thumbcolumns; j++) {
         divThumb = document.createElement('div');
         divThumb.className = 'thumb';
+        divThumb.id = "thum" + n;
         divThumb.style.left = (30 + j * 130) + "px";
         divThumb.style.top = (i * 130) + "px";
         divThumbs.appendChild(divThumb);
+        n++;
       }
     }
   })();
   
   function fillThumbs(catid) {
-    var catlist = category[catid];
+    var catlist = category[catid].entry;
     var picCount = catlist.length;
+    var j;
+    var toShow;
+    var divThumb;
+    var picInfo;
+    var url;
+    thumIndex = Math.min(picCount, thumIndex);
+    toShow = Math.min(16, picCount - thumIndex);
+    removeClass(".thumb", "active");
+    for (j=0; j<toShow; j++) {
+        picInfo = catlist[thumIndex + j];
+        url = picInfo.entrythumblink;
+        addClass("#thum" + j, "active");
+        divThumb = document.getElementById('thum' + j);
+        divThumb.style.backgroundImage = 'url("' + url + '")';
+    }
+    
+    /**
+     *  Need access to picCount 
+     */
+    divThumbs.onmousemove = function(e) {
+      if (e.target.id === 'thumbs') return;
+      var id = thumIndex + +e.target.id.substr(4);
+      if (id > picCount - 1) return;
+      divDBG.innerHTML = id;
+    }
+    
   }
   
   fillThumbs(0);
+  
   
   spanText.innerHTML = catNames.join(' ');
   scrollLength = spanText.offsetWidth;
   divText.style.width = scrollLength + "px";
   divText.innerHTML = txtCat;
   
-  divLeft.onmouseover = function(e) {
+  divLeft.onclick = divLeft.onmouseover = function(e) {
     var speed;
     if (scrolling) return;
     if (scrollIndex > 0 ) {
@@ -80,7 +114,7 @@ function setup() {
     }
   }
   
-  divRight.onmouseover = function(e) {
+  divRight.onclick = divRight.onmouseover = function(e) {
     var speed;
     if (scrolling) return;
     if (scrollIndex < catsize - 1 ) {
@@ -109,8 +143,39 @@ function setup() {
   function showCategory(e) {
     var spanCat = e.target;
     var catIdx = spanCat.dataset.idx;    
-    console.log(catIdx);
+    fillThumbs(catIdx);
   }
   
 
+}
+
+/**
+ * removes class given by klass from all dom-objects matched by selector
+ * @param {cssselect} selector
+ * @param {string} klass
+ */
+function removeClass(selector, klass) {
+	  var items = document.querySelectorAll(selector);
+	  var i;
+	  if (items.length) {
+		  for (i = 0; i < items.length; i++) {
+			  items[i].classList.remove(klass);
+		  }
+	  }
+}
+
+
+/**
+   * adds class given by klass to all dom-objects matched by selector
+   * @param {cssselect} selector
+   * @param {string} klass
+   */
+function addClass(selector, klass) {
+	  var items = document.querySelectorAll(selector);
+	  var i;
+	  if (items.length) {
+		  for (i = 0; i < items.length; i++) {
+			  items[i].classList.add(klass);
+		  }
+	  }
 }
