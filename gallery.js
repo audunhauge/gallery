@@ -5,6 +5,7 @@ function setup() {
    */
   var divText = document.getElementById("text");
   var divRight = document.getElementById("right");
+  var divTitle = document.getElementById("title");
   var divThumbs = document.getElementById("thumbs");
   var divLeft = document.getElementById("left");
   var divScroll = document.getElementById("scroll");
@@ -53,10 +54,8 @@ function setup() {
     for (i=0; i<config.thumbrows; i++) {
       for (j=0; j<config.thumbcolumns; j++) {
         divThumb = document.createElement('div');
-        divThumb.className = 'thumb';
+        divThumb.className = 'thumb row' + i + ' col' + j;
         divThumb.id = "thum" + n;
-        divThumb.style.left = (30 + j * 130) + "px";
-        divThumb.style.top = (i * 130) + "px";
         divThumbs.appendChild(divThumb);
         n++;
       }
@@ -86,10 +85,32 @@ function setup() {
      *  Need access to picCount 
      */
     divThumbs.onmousemove = function(e) {
+      divTitle.innerHTML = "";
       if (e.target.id === 'thumbs') return;
       var id = thumIndex + +e.target.id.substr(4);
       if (id > picCount - 1) return;
-      divDBG.innerHTML = id;
+      picInfo = catlist[thumIndex + id];
+      var txt = htmlDecode(picInfo.$t);
+      divTitle.innerHTML = txt;
+    }
+    
+     divThumbs.onmouseout = function(e) {
+       removeClass(".thumb", "enlarged");
+     }
+    
+     divThumbs.onclick = function(e) {
+      divTitle.innerHTML = "";
+      removeClass(".thumb", "enlarged");
+      if (e.target.id === 'thumbs') return;
+      var id = thumIndex + +e.target.id.substr(4);
+      if (id > picCount - 1) return;
+      picInfo = catlist[thumIndex + id];
+      var txt = htmlDecode(picInfo.$t);
+      divTitle.innerHTML = txt;
+      url = picInfo.entrylink;
+      divThumb = document.getElementById('thum' + id);
+      divThumb.style.backgroundImage = 'url("' + url + '")';
+      addClass("#thum" + id, "enlarged");
     }
     
   }
@@ -178,4 +199,10 @@ function addClass(selector, klass) {
 			  items[i].classList.add(klass);
 		  }
 	  }
+}
+
+function htmlDecode(input){
+  var e = document.createElement('div');
+  e.innerHTML = input;
+  return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }

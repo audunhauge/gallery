@@ -115,15 +115,35 @@ span.cat:hover {
   position: absolute;
   width: 125px;
   height: 125px;
+  background-color: white;
+  background-repeat: no-repeat;
   background-image: none;
-  background-size: cover;
+  background-size: contain;
+  background-position: center;
   opacity: 0;
-  transition: transform 0.4s ease, opacity 0.3s;
+  transition: transform 0.4s ease,
+              opacity 0.3s, 
+              width 0.3s ease,
+              height 0.3s ease,
+              left 0.3s ease,
+              top 0.3s ease;
 }
 
 .active {
   opacity: 0.7;
 }
+
+.row0 {  top: 0px; }
+.row1 {  top: 130px; }
+.row2 {  top: 260px; }
+.row3 {  top: 390px; }
+
+.col0 {  left: 30px; }
+.col1 {  left: 160px; }
+.col2 {  left: 290px; }
+.col3 {  left: 420px; }
+
+
 
 .active:hover {
   opacity: 1;
@@ -134,6 +154,14 @@ span.cat:hover {
   box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
 }
 
+.thumb.enlarged {
+  transform: scale(1);
+  width: 500px;
+  height: 550px;
+  top: -20px;
+  left: 40px;
+}
+
 #title {
   position: absolute;
   width: 100%;
@@ -141,4 +169,7 @@ span.cat:hover {
   bottom: 0;
   height: 90px;
   text-align: center;
+  font-size: 0.6em;
+  color: white;
+  background: #a4d2d2;
 }
