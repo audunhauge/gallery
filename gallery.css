@@ -50,6 +50,39 @@
   transition: left 0.3s ease-in-out;
 }
 
+#left {
+  position: absolute;
+  left:0px;
+  top:0px;
+  height: 100%;
+  width: 40px;
+  background: green;
+  opacity: 0.05;
+}
+
+#right {
+  position: absolute;
+  right:0px;
+  top:0px;
+  height: 100%;
+  width: 40px;
+  background: green;
+  opacity: 0.05;
+}
+
+#right:hover {
+  opacity: 0.4;
+  -webkit-clip-path: polygon(0 0, 100% 50%, 0 100%);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+
+#left:hover {
+  opacity: 0.4;
+   -webkit-clip-path: polygon(100% 0%, 0 50%, 100% 100%);
+  clip-path: polygon(100% 0%, 0 50%, 100% 100%);
+}
+
 #debug {
   position: absolute;
   left: 0px;

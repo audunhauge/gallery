@@ -92,7 +92,7 @@ function setup() {
   function showCategory(e) {
     var spanCat = e.target;
     var catIdx = spanCat.dataset.idx;    
-    
+    console.log(catIdx);
   }
   
 
