@@ -23,6 +23,7 @@ function setup() {
   
   /* Thumb paging */
   var thumIndex = 0;        // will be 0, 16, ...
+  var enlarged = false;     // true if viewing large image
  
 
   var config = imagelist.mediagallery;
@@ -65,45 +66,87 @@ function setup() {
   function fillThumbs(catid) {
     var catlist = category[catid].entry;
     var picCount = catlist.length;
-    var j;
-    var toShow;
     var divThumb;
     var picInfo;
+    var id;     // current image id
     var url;
     thumIndex = Math.min(picCount, thumIndex);
-    toShow = Math.min(16, picCount - thumIndex);
-    removeClass(".thumb", "active");
-    for (j=0; j<toShow; j++) {
+    
+    makeThumbs();
+    
+    function makeThumbs() {
+      var j;
+      var toShow = Math.min(16, picCount - thumIndex);
+      removeClass(".thumb", "active");
+      for (j=0; j<toShow; j++) {
         picInfo = catlist[thumIndex + j];
         url = picInfo.entrythumblink;
         addClass("#thum" + j, "active");
         divThumb = document.getElementById('thum' + j);
         divThumb.style.backgroundImage = 'url("' + url + '")';
+      }
     }
-    
     /**
      *  Need access to picCount 
      */
     divThumbs.onmousemove = function(e) {
+      if (enlarged) return;
       divTitle.innerHTML = "";
       if (e.target.id === 'thumbs') return;
-      var id = thumIndex + +e.target.id.substr(4);
+      id = +e.target.id.substr(4);
       if (id > picCount - 1) return;
       picInfo = catlist[thumIndex + id];
       var txt = htmlDecode(picInfo.$t);
       divTitle.innerHTML = txt;
     }
+      
+    divThumbs.onclick = function(e) {
+      if (enlarged) {
+        if (e.offsetX < 60) {
+          prevPix(null);
+        } else if (e.offsetX > 455) {
+          nextPix(null);
+        } else {
+          divDBG.innerHTML = e.offsetX;
+          removeClass(".thumb", "enlarged");
+          enlarged = false;
+        }
+      } else {
+        enlarged = true;
+        divTitle.innerHTML = "";
+        removeClass(".thumb", "enlarged");
+        if (e.target.id === 'thumbs') return;
+        id = +e.target.id.substr(4);
+        if (id > picCount - 1) return;
+        showPix();
+      }
+    }
     
-     divThumbs.onmouseout = function(e) {
-       removeClass(".thumb", "enlarged");
-     }
+    function nextPix() {
+      if (id > picCount - 2) return;
+      id ++;
+      if (id > 15) {
+      	thumIndex += 16;
+      	id = 0;
+      	makeThumbs();
+      }
+      showPix();
+    }
     
-     divThumbs.onclick = function(e) {
+    function prevPix() {
+      if (id < 1 && thumIndex === 0) return;
+      id --;
+      if (id < 0) {
+      	thumIndex -= 16;
+      	id = 15;
+      	makeThumbs();
+      }
+      showPix();
+    }
+    
+    function showPix() {
       divTitle.innerHTML = "";
       removeClass(".thumb", "enlarged");
-      if (e.target.id === 'thumbs') return;
-      var id = thumIndex + +e.target.id.substr(4);
-      if (id > picCount - 1) return;
       picInfo = catlist[thumIndex + id];
       var txt = htmlDecode(picInfo.$t);
       divTitle.innerHTML = txt;
@@ -112,8 +155,9 @@ function setup() {
       divThumb.style.backgroundImage = 'url("' + url + '")';
       addClass("#thum" + id, "enlarged");
     }
-    
   }
+  
+  
   
   fillThumbs(0);
   
@@ -123,7 +167,9 @@ function setup() {
   divText.style.width = scrollLength + "px";
   divText.innerHTML = txtCat;
   
-  divLeft.onclick = divLeft.onmouseover = function(e) {
+  divLeft.onclick = divLeft.onmouseover = goLeft;
+  
+  function goLeft(e) {
     var speed;
     if (scrolling) return;
     if (scrollIndex > 0 ) {
@@ -135,7 +181,9 @@ function setup() {
     }
   }
   
-  divRight.onclick = divRight.onmouseover = function(e) {
+  divRight.onclick = divRight.onmouseover = goRight;
+  
+  function goRight(e) {
     var speed;
     if (scrolling) return;
     if (scrollIndex < catsize - 1 ) {
@@ -150,8 +198,9 @@ function setup() {
     catScroll = Math.min(0, catScroll );
     catScroll = Math.max(-scrollLength - 100, catScroll);
     divText.style.left = catScroll + "px";
+    scrolling = true;
     if (scrollTimer == null ) {
-      scrollTimer = window.setInterval(scrollEnd, 600);
+      scrollTimer = window.setInterval(scrollEnd, 800);
     }
   }
   
@@ -162,9 +211,11 @@ function setup() {
   divText.addEventListener("click", showCategory);
   
   function showCategory(e) {
+    removeClass("span.cat", "selected");
     var spanCat = e.target;
     var catIdx = spanCat.dataset.idx;    
     fillThumbs(catIdx);
+    spanCat.classList.add("selected");
   }
   
 

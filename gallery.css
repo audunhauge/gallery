@@ -103,6 +103,10 @@ span.cat:hover {
   cursor: pointer;
 }
 
+span.cat.selected {
+  color: green;
+}
+
 #thumbs {
   position: absolute;
   width: 100%;
@@ -130,7 +134,7 @@ span.cat:hover {
 }
 
 .active {
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 .row0 {  top: 0px; }
@@ -143,12 +147,10 @@ span.cat:hover {
 .col2 {  left: 290px; }
 .col3 {  left: 420px; }
 
-
-
 .active:hover {
   opacity: 1;
   transform: scale(1.2);
-  z-index: 1000;
+  z-index: 100;
   -webkit-box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
   -moz-box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
   box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
@@ -160,6 +162,12 @@ span.cat:hover {
   height: 550px;
   top: -20px;
   left: 40px;
+  z-index: 1000;
+  opacity: 1;
+  background-color: rgba(180,200,200,0.9);
+  -webkit-box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
+  -moz-box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
+  box-shadow: 2px 2px 12px 6px rgba(0,0,0,0.75);
 }
 
 #title {
@@ -169,7 +177,10 @@ span.cat:hover {
   bottom: 0;
   height: 90px;
   text-align: center;
-  font-size: 0.6em;
+  font-size: 0.8em;
   color: white;
   background: #a4d2d2;
+}
+#title h1 {
+  font-size:1.4em;
 }
