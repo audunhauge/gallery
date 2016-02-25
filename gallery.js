@@ -4,6 +4,9 @@ function setup() {
    * References to divs
    */
   var divText = document.getElementById("text");
+  var divRight = document.getElementById("right");
+  var divThumbs = document.getElementById("thumbs");
+  var divLeft = document.getElementById("left");
   var divScroll = document.getElementById("scroll");
   var divGallery = document.getElementById("gallery");
   var divDBG = document.getElementById("debug");
@@ -11,8 +14,7 @@ function setup() {
   
   var catScroll = 0;        // start with no scroll
   var txtPos;               // mouse xpos on category scroll
-  var scrollSpeed = 0;      // no scrolling at start
-  var onScroll = false;     // mouse not on scroll line
+  var scrolling = false;    // tru if animating a scroll
   var scrollTimer = null;   // so we can turn off scroll timer
   var scrollLength = 800;   // guesstimate of text length
   var scrollIndex = 0;      // starting on first category
@@ -21,6 +23,10 @@ function setup() {
   var config = imagelist.mediagallery;
   var category = imagelist.mediagallery.category;
   var catsize = category.length; 
+  
+  /**
+   *  Build the category scroll list at top
+   */
   var catNames = [ ];
   var catWidths = [ ];    // pixel size of text each category
   var i;
@@ -33,58 +39,69 @@ function setup() {
             + category[i].title + ' </span>';
   }
   
+  /**
+   * Create thumb divs as specified by config
+   */
+  (function() {
+    var i,j;
+    var divThumb;
+    for (i=0; i<config.thumbrows; i++) {
+      for (j=0; j<config.thumbcolumns; j++) {
+        divThumb = document.createElement('div');
+        divThumb.className = 'thumb';
+        divThumb.style.left = (30 + j * 130) + "px";
+        divThumb.style.top = (i * 130) + "px";
+        divThumbs.appendChild(divThumb);
+      }
+    }
+  })();
+  
+  function fillThumbs(catid) {
+    var catlist = category[catid];
+    var picCount = catlist.length;
+  }
+  
+  fillThumbs(0);
+  
   spanText.innerHTML = catNames.join(' ');
   scrollLength = spanText.offsetWidth;
   divText.style.width = scrollLength + "px";
   divText.innerHTML = txtCat;
   
- 
-  divText.onmousemove = function(e) {
-    txtPos = e.offsetX + catScroll;
-    divDBG.innerHTML = "" + txtPos;
-    onScroll = false;
-    if (    (txtPos < 50 && scrollIndex > 0) 
-         || (txtPos > 409 && scrollIndex < catsize - 1) ) {
-      onScroll = true;
+  divLeft.onmouseover = function(e) {
+    var speed;
+    if (scrolling) return;
+    if (scrollIndex > 0 ) {
+      scrollIndex -= 1;
+      speed = catWidths[scrollIndex];
+      do_scroll(speed);
+    } else {
+      divText.style.left = "0px";
+    }
+  }
+  
+  divRight.onmouseover = function(e) {
+    var speed;
+    if (scrolling) return;
+    if (scrollIndex < catsize - 1 ) {
+      speed = -catWidths[scrollIndex];
+      scrollIndex += 1;
+      do_scroll(speed);
     } 
   }
   
-  function do_scroll() {
-    if (txtPos < 50 && scrollIndex > 0 ) {
-      scrollIndex -= 1;
-      scrollSpeed = catWidths[scrollIndex];
-    } else if (txtPos > 409 && scrollIndex < catsize - 1) {
-      scrollSpeed = -catWidths[scrollIndex];
-      scrollIndex += 1;
-    } else if (scrollIndex === 0) {
-      divText.style.left = "0px";
-    } else {
-      return;
-    }
-    catScroll += scrollSpeed;
+  function do_scroll(speed) {
+    catScroll += speed;
     catScroll = Math.min(0, catScroll );
     catScroll = Math.max(-scrollLength - 100, catScroll);
     divText.style.left = catScroll + "px";
-  }
-  
-  divText.onmouseenter = function(e) {
-    onScroll = true;
     if (scrollTimer == null ) {
-      scrollTimer = window.setInterval(scroll, 600);
+      scrollTimer = window.setInterval(scrollEnd, 600);
     }
   }
   
-  divText.onmouseleave = function(e) {
-    onScroll = false;
-    clearInterval(scrollTimer);
-    scrollTimer = null;
-  }
-  
-  
-  
-  function scroll() {
-    if (! onScroll) return;
-    do_scroll();
+  function scrollEnd(e) {
+    scrolling = false;
   }
   
   divText.addEventListener("click", showCategory);

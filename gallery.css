@@ -103,9 +103,17 @@ span.cat:hover {
   cursor: pointer;
 }
 
-.paused {
-    -webkit-animation-play-state:paused;
-    -moz-animation-play-state:paused;
-    -o-animation-play-state:paused; 
-    animation-play-state:paused;
+#thumbs {
+  position: absolute;
+  width: 100%;
+  height: 600px;
+  left: 0px;
+  bottom: 20px;
+}
+
+.thumb {
+  position: absolute;
+  width: 125px;
+  height: 125px;
+  background: green;
 }
