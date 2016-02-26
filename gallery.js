@@ -5,10 +5,13 @@ function setup() {
    * References to divs
    */
   var divText = document.getElementById("text");
-  var divRight = document.getElementById("right");
   var divTitle = document.getElementById("title");
+  var divTitleText = document.getElementById("titletext");
   var divThumbs = document.getElementById("thumbs");
   var divLeft = document.getElementById("left");
+  var divRight = document.getElementById("right");
+  var divNext = document.getElementById("nextpage");
+  var divPrev = document.getElementById("prevpage");
   var spanText = document.getElementById("textmeasure");
   
   /* The category scroll line */
@@ -114,6 +117,14 @@ function setup() {
         divThumb = document.getElementById('thum' + j);
         divThumb.style.backgroundImage = 'url("' + url + '")';
       }
+      divPrev.classList.remove("hide");
+      divNext.classList.remove("hide");
+      if (thumIndex === 0) {
+        divPrev.classList.add("hide");
+      }
+      if (thumIndex >= picCount - 16) {
+        divNext.classList.add("hide");
+      }
     }
     
     /**
@@ -121,13 +132,13 @@ function setup() {
      */
     divThumbs.onmousemove = function(e) {
       if (enlarged) return;
-      divTitle.innerHTML = "";
+      divTitleText.innerHTML = "";
       if (e.target.id === 'thumbs') return;
       id = +e.target.id.substr(4);
       if (id > picCount - 1) return;
       picInfo = catlist[thumIndex + id];
       var txt = htmlDecode(picInfo.$t);
-      divTitle.innerHTML = txt;
+      divTitleText.innerHTML = txt;
     }
       
     /**
@@ -148,13 +159,32 @@ function setup() {
         }
       } else {
         enlarged = true;
-        divTitle.innerHTML = "";
+        divTitleText.innerHTML = "";
         removeClass(".thumb", "enlarged");
         if (e.target.id === 'thumbs') return;
         id = +e.target.id.substr(4);
         if (id > picCount - 1) return;
         showPix();
       }
+    }
+      
+    /**
+      *  Navigate to next/prev page of current category
+      */
+    divNext.onclick = function (e) {
+      if (thumIndex < picCount - 16) {
+        thumIndex += 16;
+      	id = 0;
+      	setThumbPix();
+      }
+    }
+    
+    divPrev.onclick = function (e) {
+      if (thumIndex > 15) {
+  	    thumIndex -= 16;
+      	id = 0;
+      	setThumbPix();
+      } 
     }
     
     /**
@@ -195,11 +225,11 @@ function setup() {
      * Scales up the picture frame (class enlarged)
      */
     function showPix() {
-      divTitle.innerHTML = "";
+      divTitleText.innerHTML = "";
       removeClass(".thumb", "enlarged");
       picInfo = catlist[thumIndex + id];
       var txt = htmlDecode(picInfo.$t);
-      divTitle.innerHTML = txt;
+      divTitleText.innerHTML = txt;
       url = picInfo.entrylink;
       divThumb = document.getElementById('thum' + id);
       divThumb.style.backgroundImage = 'url("' + url + '")';
@@ -279,7 +309,7 @@ function setup() {
     var catIdx = spanCat.dataset.idx;    
     fillThumbs(catIdx);
     spanCat.classList.add("selected");
-  }
+  } 
 
 }
 

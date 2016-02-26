@@ -6,6 +6,7 @@
   left:0;
   right:0;
   background-color:rgba(100,140,200,0.3);
+  overflow: hidden;
 }
 #gallery:after {
   content: "";
@@ -210,27 +211,34 @@ span.cat.selected {
 }
 
 /* show cursor indicating navigation, arrow right */
-#title:before {
-  content: "";
+#nextpage {
   position: absolute;
   width: 70px;
   height: 100px;
   top: 0px;
   right: 0px;
   cursor: e-resize;
+  background: rgba(10,210,250,0.3);
+  -webkit-clip-path: polygon(10% 10%, 90% 50%, 10% 90%);
+  clip-path: polygon(10% 10%, 90% 50%, 10% 90%);
 }
 
 /* show cursor indicating navigation, arrow left */
-#title:after {
-  content: "";
+#prevpage {
   position: absolute;
   width: 70px;
   height: 100px;
   top: 0px;
   left: 0px;
   cursor: w-resize;
+  background: rgba(10,210,250,0.3);
+  -webkit-clip-path: polygon(90% 10%, 10% 50%, 90% 90%);
+  clip-path: polygon(100% 0%, 0 50%, 100% 100%);
 }
 
+#prevpage.hide, #nextpage.hide {
+  opacity: 0;
+}
 
 /*
  *   Preload images for better response
