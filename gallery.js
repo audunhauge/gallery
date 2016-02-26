@@ -1,3 +1,4 @@
+/* global imagelist */
 
 function setup() {
   /**
@@ -8,32 +9,21 @@ function setup() {
   var divTitle = document.getElementById("title");
   var divThumbs = document.getElementById("thumbs");
   var divLeft = document.getElementById("left");
-  var divScroll = document.getElementById("scroll");
-  var divGallery = document.getElementById("gallery");
-  var divDBG = document.getElementById("debug");
   var spanText = document.getElementById("textmeasure");
   
   /* The category scroll line */
-  var catScroll = 0;        // start with no scroll
-  var txtPos;               // mouse xpos on category scroll
   var scrolling = false;    // tru if animating a scroll
   var scrollTimer = null;   // so we can turn off scroll timer
   var scrollLength = 800;   // guesstimate of text length
   var scrollIndex = 0;      // starting on first category
   
-  /* Thumb paging */
-  var thumIndex = 0;        // will be 0, 16, ...
-  var enlarged = false;     // true if viewing large image
- 
-
   var config = imagelist.mediagallery;
   var category = imagelist.mediagallery.category;
   var catsize = category.length; 
   
-  /**
-   *  Build the category scroll list at top
-   */
-  var catNames = [ ];
+  var catScroll = 0;      // stores scroll offset for category names
+  var catPreload = [ ];   // set to 1 when category images preloaded 
+  var catNames = [ ];     // category names
   var catWidths = [ ];    // pixel size of text each category
   var i;
   var txtCat = '';
@@ -44,6 +34,10 @@ function setup() {
     txtCat += '<span class="cat" data-idx="' + i + '">'
             + category[i].title + ' </span>';
   }
+  spanText.innerHTML = catNames.join(' ');
+  scrollLength = spanText.offsetWidth;
+  divText.style.width = scrollLength + "px";
+  divText.innerHTML = txtCat;
   
   /**
    * Create thumb divs as specified by config
@@ -63,18 +57,53 @@ function setup() {
     }
   })();
   
+  /**
+   * Start preloading image sets
+   * Called once for each category while thumbs are being shown
+   * @param {int} catid - index for category to load
+   */
+  function preload(catid) {
+    if (catPreload[catid] === 1) return;
+    catPreload[catid] = 1;
+    var catlist = category[catid].entry;
+    var j, picInfo, divPic;
+    var divPreload = document.getElementById("preload");
+    for (j=0; j<catlist.length; j++) {
+      picInfo = catlist[j];
+      divPic = document.createElement('img');
+      divPic.src = picInfo.entrylink;
+      divPreload.appendChild(divPic);
+    }
+  }
+  
+  /* Start of function-closure for thumbs/image interaction */
+  /**********************************************************/
+  /**
+   *  Fills thumbs with images from selected category
+   *  Sub-functions for user interactions with thumbs/enlarged pix
+   *  This function-closure handles all interactions with thumbs
+   *  and enlarged images. The vars in the closure keep state
+   *  so we can access current image, thumbIndex (for paged view) etc
+   *  @param {int} catid  category index
+   */
   function fillThumbs(catid) {
     var catlist = category[catid].entry;
     var picCount = catlist.length;
     var divThumb;
     var picInfo;
-    var id;     // current image id
+    var id;                 // current image id
     var url;
-    thumIndex = Math.min(picCount, thumIndex);
+    var thumIndex = 0;      // start on first page
+    var enlarged = false;   // true if viewing large image
+ 
+    preload(catid);         // load large images in preload div   
+    setThumbPix();
     
-    makeThumbs();
-    
-    function makeThumbs() {
+    /**
+     * Set url to thumb for current page of selected category
+     * Will be called later when changing to new page (16 thumbs/page)
+     */
+    function setThumbPix() {
       var j;
       var toShow = Math.min(16, picCount - thumIndex);
       removeClass(".thumb", "active");
@@ -86,8 +115,9 @@ function setup() {
         divThumb.style.backgroundImage = 'url("' + url + '")';
       }
     }
+    
     /**
-     *  Need access to picCount 
+     *  Update picture info    
      */
     divThumbs.onmousemove = function(e) {
       if (enlarged) return;
@@ -100,14 +130,19 @@ function setup() {
       divTitle.innerHTML = txt;
     }
       
+    /**
+     * Click on thumb/picture
+     * Toggles between thumb/enlarged view
+     * If view is enlarged and click close to right/left edge
+     * then show next/prev picture
+     */
     divThumbs.onclick = function(e) {
       if (enlarged) {
         if (e.offsetX < 60) {
-          prevPix(null);
+          prevPix();
         } else if (e.offsetX > 455) {
-          nextPix(null);
+          nextPix();
         } else {
-          divDBG.innerHTML = e.offsetX;
           removeClass(".thumb", "enlarged");
           enlarged = false;
         }
@@ -122,28 +157,43 @@ function setup() {
       }
     }
     
+    /**
+     * Show next pix in category, changing page if neccessary
+     * current page is thumbIndex, changed in increments of 16
+     */
     function nextPix() {
       if (id > picCount - 2) return;
       id ++;
       if (id > 15) {
       	thumIndex += 16;
       	id = 0;
-      	makeThumbs();
+      	setThumbPix();
       }
       showPix();
     }
     
+    /**
+     * Show prev pix in category, changing page if neccessary
+     * current page is thumbIndex, changed in increments of 16
+     */
     function prevPix() {
       if (id < 1 && thumIndex === 0) return;
       id --;
       if (id < 0) {
       	thumIndex -= 16;
       	id = 15;
-      	makeThumbs();
+      	setThumbPix();
       }
       showPix();
     }
     
+    /**
+     * Shows current selected picture enlarged
+     * First removes class enlarged from all thumbs
+     * Updates info text for current picture
+     * Sets background to url of large version
+     * Scales up the picture frame (class enlarged)
+     */
     function showPix() {
       divTitle.innerHTML = "";
       removeClass(".thumb", "enlarged");
@@ -156,26 +206,23 @@ function setup() {
       addClass("#thum" + id, "enlarged");
     }
   }
+  /* End of function-closure for thumbs/image interaction */
+  /********************************************************/
   
-  
-  
-  fillThumbs(0);
-  
-  
-  spanText.innerHTML = catNames.join(' ');
-  scrollLength = spanText.offsetWidth;
-  divText.style.width = scrollLength + "px";
-  divText.innerHTML = txtCat;
+  fillThumbs(0);   // auto-fill thumbs from first category
   
   divLeft.onclick = divLeft.onmouseover = goLeft;
   
+  /**
+   * Scroll categories so a new one comes in from the left side
+   */
   function goLeft(e) {
-    var speed;
+    var distance;
     if (scrolling) return;
     if (scrollIndex > 0 ) {
       scrollIndex -= 1;
-      speed = catWidths[scrollIndex];
-      do_scroll(speed);
+      distance = catWidths[scrollIndex];
+      do_scroll(distance);
     } else {
       divText.style.left = "0px";
     }
@@ -183,33 +230,49 @@ function setup() {
   
   divRight.onclick = divRight.onmouseover = goRight;
   
+  /**
+   * Scroll categories so a new one comes in from the right side
+   */  
   function goRight(e) {
-    var speed;
+    var distance;
     if (scrolling) return;
     if (scrollIndex < catsize - 1 ) {
-      speed = -catWidths[scrollIndex];
+      distance = -catWidths[scrollIndex];
       scrollIndex += 1;
-      do_scroll(speed);
+      do_scroll(distance);
     } 
   }
   
-  function do_scroll(speed) {
-    catScroll += speed;
+   /**
+   * Scroll categories right/left
+   * catScroll accumulates total scroll length
+   * A timer blocks scrolling for 0.5s, the scroll takes 0.3s
+   * @param {int} speed  - displacement equal to text size of category name
+   */
+  function do_scroll(distance) {
+    catScroll += distance;
     catScroll = Math.min(0, catScroll );
     catScroll = Math.max(-scrollLength - 100, catScroll);
     divText.style.left = catScroll + "px";
     scrolling = true;
     if (scrollTimer == null ) {
-      scrollTimer = window.setInterval(scrollEnd, 800);
+      scrollTimer = window.setInterval(scrollEnd, 500);
     }
   }
   
+  /**
+   * Enable scrolling again, called by timer
+   */
   function scrollEnd(e) {
     scrolling = false;
   }
   
   divText.addEventListener("click", showCategory);
   
+  /**
+   * A category is selected, mark with green font
+   * and call fillThumbs with category index
+   */
   function showCategory(e) {
     removeClass("span.cat", "selected");
     var spanCat = e.target;
@@ -217,7 +280,6 @@ function setup() {
     fillThumbs(catIdx);
     spanCat.classList.add("selected");
   }
-  
 
 }
 
@@ -252,6 +314,11 @@ function addClass(selector, klass) {
 	  }
 }
 
+/**
+ * Converts html-enteties to markup
+ * @param {string} input - text containing html-enteties
+ * @returns {string}  input with all enteties replaced, (&lt; becomes <)
+ */
 function htmlDecode(input){
   var e = document.createElement('div');
   e.innerHTML = input;
